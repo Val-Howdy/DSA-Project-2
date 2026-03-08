@@ -9,6 +9,11 @@
 #include <vector>
 #include <map>
 #include <chrono>
+#include <fstream>
+#include <sstream>
+#include <iostream>
+#include <algorithm>
+#include <iomanip>
 
 using std::string;
 using std::vector;
@@ -17,23 +22,60 @@ using std::map;
 class CountyManager {
 
     public:
+    // stores the covid data for each week
     struct Week
     {
         int _cases;
         int _deaths;
-        float _rate;
+        int _cumulative_cases;
+        int _cumulative_deaths;
+
+        Week(int cases, int deaths, int cumulative_cases, int cumulative_deaths);
     };
-    struct Country
+    // represents each county, storing data and the weeks vector.
+    struct County
     {
         string _name;
         string _state;
-        int _population;
-        vector<Week> _weeks;
+        int _population = -1; // -1 represents un assinged population
+        vector<Week> _weeks; //list of weeks in order, indexed by weeks since 01/22/2020
+        County(string &name, string &state);
+        void addData(std::stringstream &ss); // parse a CSV line and adds it to the week vector
     };
     private:
+    // county map. Key: fips code (5 digit string), Value: County obj
+    map<string, County> _counties;
 
+    public:
 
+    /**
+     * Constructor: initializesad the manager by loing both covid and Population CSVs.
+     * @param covidDataPath path to the covid data CSV
+     * @param populationDataPath path to the population data CSV
+     */
+    CountyManager(string covidDataPath = "data/Covid_data.csv",string populationDataPath = "data/Population_data.csv");
 
+    /**
+    * parses a single row from the covid data CSV
+    * if it has a novel fips code it creates a new County, then it calls addData with the remainder of the CSV line
+    * if the county already exists it calls addData with the remainder of the CSV line
+    */
+    void load(std::stringstream &ss);
+
+    /**
+    * helper to read a CSV cell and strip quotes. e.g "01005" into 01005
+    */
+    static std::string cleanGetline(std::stringstream& ss);
+
+    /**
+     * formats and prints all data at a given fips code to the console.
+     */
+    void printCountyData(const std::string& fips) const;
+
+    /**
+     * reads the population CSV and updates the _population field for existing counties.
+     */
+    void loadPopulation(string &filename);
 
 };
 
