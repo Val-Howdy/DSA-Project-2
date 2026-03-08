@@ -77,6 +77,22 @@ class CountyManager {
      */
     void loadPopulation(string &filename);
 
+    /**
+     * overloaded subscript operator to access a County object by its fips code.
+    * @param code The 5-digit fips code string.
+    * @return A copy of the county object.
+    * @throws std::out_of_range if the fips code is not found.
+    */
+    County operator[](string fips) const;
+
+
+    /**
+    * Checks if a county exists in the map based on its fips code.
+    * @param fips The 5-digit fips string to search for.
+    * @return true if the fips exists, false otherwise.
+    */
+    bool hasCounty(const std::string& fips) const;
+
 };
 
 

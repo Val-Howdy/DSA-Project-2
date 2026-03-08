@@ -170,3 +170,13 @@ void CountyManager::loadPopulation(string &filename)
     }
 }
 
+
+CountyManager::County CountyManager::operator[](string fips) const
+{
+    return _counties.at(fips);
+}
+
+bool CountyManager::hasCounty(const std::string& fips) const
+{
+    return _counties.find(fips) != _counties.end();
+}
