@@ -93,6 +93,12 @@ class CountyManager {
     */
     bool hasCounty(const std::string& fips) const;
 
+
+
+
+    using const_iterator = map<string, County>::const_iterator;
+    const_iterator begin() const { return _counties.begin(); }
+    const_iterator end() const { return _counties.end(); }
 };
 
 
