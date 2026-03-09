@@ -107,6 +107,15 @@ class CountyManager {
     int getClosestWeekAfter(int year, int month, int day);
 
 
+    /**
+     * calculates the total cases between start and end dates, divides by
+     * the county population, and stores the result as a pair (cases_per_capita, FIPS).
+     * @param start_year, start_month, start_day Beginning of the range.
+     * @param end_year, end_month, end_day End of the range.
+     * @param outputvector Vector to be populated with pairs of {float: per_capita, string: fips}.
+     * @return true if the date range is valid and data was processed, false otherwise.
+     */
+    bool getFormatedData(int start_year,int start_month, int start_day, int end_year, int end_month, int end_day,vector<std::pair<float,string>> &outputvector);
 
 
 

@@ -226,5 +226,34 @@ int CountyManager::getClosestWeekAfter(int year, int month, int day)
     return index;
 }
 
+bool CountyManager::getFormatedData(int start_year, int start_month, int start_day,
+    int end_year, int end_month, int end_day, vector<std::pair<float, string>>& outputvector)
+{
+    int start_index = getClosestWeekBefore(start_year, start_month, start_day);
+    if (start_index == -1) return false;
+    int end_index = getClosestWeekAfter(end_year, end_month, end_day);
+    if (end_index == -1) return false;
+    if (end_index < start_index) return false;
+
+    for (auto & pair : _counties)
+    {
+        int total_loops = end_index - start_index + 1;
+        int total_cases =0;
+        for (int i = 0; i < total_loops; i++)
+        {
+            total_cases += pair.second._weeks[start_index + i]._cases;
+        }
+        float cases_per_capita = float(total_cases) / pair.second._population;
+        outputvector.emplace_back(cases_per_capita, pair.first);
+    }
+
+    return true;
+
+
+}
+
+
+
+
 
 
