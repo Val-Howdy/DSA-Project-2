@@ -180,3 +180,51 @@ bool CountyManager::hasCounty(const std::string& fips) const
 {
     return _counties.find(fips) != _counties.end();
 }
+
+/**
+ * helper function to calculate total days since year 0 while handling leap years.
+ */
+int CountyManager::daysSinceEpoch(int y, int m, int d)
+{
+    if (m < 3) {
+        y--;
+        m += 12;
+    }
+    return 365 * y + y / 4 - y / 100 + y / 400 + (153 * m - 457) / 5 + d - 306;
+}
+
+int CountyManager::getClosestWeekBefore(int year, int month, int day)
+{
+    int startDays = daysSinceEpoch(2020, 1, 22);
+    int targetDays = daysSinceEpoch(year, month, day);
+    int d = targetDays - startDays;
+
+    if (d < 0) return -1; // Date is before index 0
+
+    int index = d / 7;
+
+    // Dataset ends at 05/10/2023 (index 172)
+    if (index > 172) return 172;
+
+    return index;
+}
+
+int CountyManager::getClosestWeekAfter(int year, int month, int day)
+{
+    int startDays = daysSinceEpoch(2020, 1, 22);
+    int targetDays = daysSinceEpoch(year, month, day);
+    int d = targetDays - startDays;
+
+    // If date is before or exactly on start date, closest after is index 0
+    if (d <= 0) return 0;
+
+    int index = (d + 6) / 7;
+
+    // If the required index is beyond our data (max index 172)
+    if (index > 172) return -1;
+
+    return index;
+}
+
+
+

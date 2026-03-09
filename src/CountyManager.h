@@ -8,7 +8,6 @@
 #include <string>
 #include <vector>
 #include <map>
-#include <chrono>
 #include <fstream>
 #include <sstream>
 #include <iostream>
@@ -99,6 +98,18 @@ class CountyManager {
     using const_iterator = map<string, County>::const_iterator;
     const_iterator begin() const { return _counties.begin(); }
     const_iterator end() const { return _counties.end(); }
+
+
+
+    static int daysSinceEpoch(int y, int m, int d);
+
+    int getClosestWeekBefore(int year, int month, int day);
+    int getClosestWeekAfter(int year, int month, int day);
+
+
+
+
+
 };
 
 
