@@ -196,32 +196,33 @@ int CountyManager::daysSinceEpoch(int y, int m, int d)
 int CountyManager::getClosestWeekBefore(int year, int month, int day)
 {
     int startDays = daysSinceEpoch(2020, 1, 22);
+    int endDays   = daysSinceEpoch(2023, 5, 10);
     int targetDays = daysSinceEpoch(year, month, day);
+
+    if (targetDays < startDays || targetDays > endDays) {
+        return -1;
+    }
+
     int d = targetDays - startDays;
-
-    if (d < 0) return -1; // Date is before index 0
-
-    int index = d / 7;
-
-    // Dataset ends at 05/10/2023 (index 172)
-    if (index > 172) return 172;
-
-    return index;
+    return d / 7;
 }
 
 int CountyManager::getClosestWeekAfter(int year, int month, int day)
 {
     int startDays = daysSinceEpoch(2020, 1, 22);
+    int endDays   = daysSinceEpoch(2023, 5, 10);
     int targetDays = daysSinceEpoch(year, month, day);
+
+    if (targetDays < startDays || targetDays > endDays) {
+        return -1;
+    }
+
     int d = targetDays - startDays;
-
-    // If date is before or exactly on start date, closest after is index 0
-    if (d <= 0) return 0;
-
     int index = (d + 6) / 7;
 
-    // If the required index is beyond our data (max index 172)
-    if (index > 172) return -1;
+    if (index > 172) {
+        return 172;
+    }
 
     return index;
 }

@@ -103,8 +103,8 @@ class CountyManager {
 
     static int daysSinceEpoch(int y, int m, int d);
 
-    int getClosestWeekBefore(int year, int month, int day);
-    int getClosestWeekAfter(int year, int month, int day);
+    static int getClosestWeekBefore(int year, int month, int day);
+    static int getClosestWeekAfter(int year, int month, int day);
 
 
     /**
