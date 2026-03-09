@@ -1,7 +1,7 @@
 #include <catch2/catch_test_macros.hpp>
 #include <iostream>
 #include "CountyManager.h"
-#include <filesystem>
+#include <catch2/catch_approx.hpp>
 
 using namespace std;
 
@@ -27,7 +27,7 @@ TEST_CASE("CountyManager: Output methods", "[Output methods]") {
 
 
 //this is a general test for any test that wants to look at all of the data
-TEST_CASE("full data tests", "[Data Import]")
+TEST_CASE("full data import tests", "[Data Import]")
 {
 	CountyManager manager("data/Covid_data.csv", "data/Population_data.csv");
 
@@ -61,5 +61,94 @@ TEST_CASE("CountyManager: Helper methods", "[Helper Methods]") {
 
 		REQUIRE(cell1 == "01005");
 		REQUIRE(cell2 == "Barbour County");
+	}
+	SECTION("daysSinceEpoch")
+	{
+		int day1 = CountyManager::daysSinceEpoch(2020, 1, 1);
+		int day2 = CountyManager::daysSinceEpoch(2020, 1, 2);
+		REQUIRE(day2 - day1 == 1);
+
+		// Test Leap Year
+		int feb28 = CountyManager::daysSinceEpoch(2020, 2, 28);
+		int march1 = CountyManager::daysSinceEpoch(2020, 3, 1);
+		REQUIRE(march1 - feb28 == 2);
+
+		// Test non-Leap Year
+		int feb28_21 = CountyManager::daysSinceEpoch(2021, 2, 28);
+		int march1_21 = CountyManager::daysSinceEpoch(2021, 3, 1);
+		REQUIRE(march1_21 - feb28_21 == 1);
+	}
+	SECTION("getClosestWeekBefore")
+	{
+		// Exact start date
+		REQUIRE(CountyManager::getClosestWeekBefore(2020, 1, 22)== 0);
+		// One day before start
+		REQUIRE(CountyManager::getClosestWeekBefore(2020, 1, 21) == -1);
+		// 6 days after start
+		REQUIRE(CountyManager::getClosestWeekBefore(2020, 1, 28)== 0);
+		// 7 days after start
+		REQUIRE(CountyManager::getClosestWeekBefore(2020, 1, 29)== 1);
+		// future (cap at 172)
+		REQUIRE(CountyManager::getClosestWeekBefore(2030, 1, 1)== -1);
+	}
+	SECTION("getClosestWeekAfter")
+	{
+		// Exact start date
+		REQUIRE(CountyManager::getClosestWeekAfter(2020, 1, 22)== 0);
+		// One day after start
+		REQUIRE(CountyManager::getClosestWeekAfter(2020, 1, 23)== 1);
+		// Exactly at the end of the data
+		REQUIRE(CountyManager::getClosestWeekAfter(2023, 5, 10)== 172);
+		// Past the end of the data
+		REQUIRE(CountyManager::getClosestWeekAfter(2023, 5, 11)== -1);
+	}
+}
+
+
+TEST_CASE("CountyManager: getFormatedData error handling", "[Data Export]") {
+	CountyManager manager("data/test_Covid_data.csv", "data/test_Population_data.csv");
+	vector<pair<float, string>> output;
+
+	SECTION("Invalid Range: End before Start") {
+		// Start: 2021-01-01, End: 2020-01-01
+		bool success = manager.getFormatedData(2021, 1, 1, 2020, 1, 1, output);
+		REQUIRE_FALSE(success);
+	}
+
+	SECTION("Out of Bounds: Date before dataset start") {
+		// Dataset starts 2020-01-22
+		bool success = manager.getFormatedData(2019, 12, 31, 2020, 1, 1, output);
+		REQUIRE_FALSE(success);
+	}
+
+	SECTION("Out of Bounds: Date after dataset end") {
+		// Dataset ends 2023-05-10
+		bool success = manager.getFormatedData(2023, 6, 1, 2023, 7, 1, output);
+		REQUIRE_FALSE(success);
+	}
+}
+
+TEST_CASE("Full data Export tests", "[Data Export]") {
+	CountyManager manager("data/Covid_data.csv", "data/Population_data.csv");
+	vector<pair<float, string>> output;
+
+	// First two weeks of the dataset (Jan 22, 2020 to Feb 5, 2020)
+	bool success = manager.getFormatedData(2020, 1, 22, 2020, 2, 5, output);
+
+	REQUIRE(success);
+	REQUIRE_FALSE(output.empty());
+
+	SECTION("verify specific County") {
+		string targetFips = "01021";
+		auto it = find_if(output.begin(), output.end(),
+			[&](pair<float, string>& p) { return p.second == targetFips; });
+
+		if (it != output.end()) {
+			auto county = manager[targetFips];
+			int expected_cases = county._weeks[0]._cases + county._weeks[1]._cases + county._weeks[2]._cases;
+			float expected_per_capita = (float)expected_cases / county._population;
+
+			REQUIRE(it->first == Catch::Approx(expected_per_capita));
+		}
 	}
 }
