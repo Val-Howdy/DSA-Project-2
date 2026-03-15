@@ -73,16 +73,8 @@ void CountyManager::load(std::stringstream &ss)
     std::string fips = cleanGetline(ss);
     std::string name = cleanGetline(ss);
     std::string state = cleanGetline(ss);
-    if (_counties.find(fips) != _counties.end())
-    {
-        //read data
-        _counties.at(fips).addData(ss);
-
-    } else
-    {
-        _counties.emplace(fips,County(name,state));
-        _counties.at(fips).addData(ss);
-    }
+    auto [it, inserted] = _counties.try_emplace(fips, name, state);
+    it->second.addData(ss);
 }
 
 /**
