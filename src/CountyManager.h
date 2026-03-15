@@ -7,7 +7,7 @@
 
 #include <string>
 #include <vector>
-#include <map>
+#include <unordered_map>
 #include <fstream>
 #include <sstream>
 #include <iostream>
@@ -16,7 +16,7 @@
 
 using std::string;
 using std::vector;
-using std::map;
+using std::unordered_map;
 
 class CountyManager {
 
@@ -43,7 +43,7 @@ class CountyManager {
     };
     private:
     // county map. Key: fips code (5 digit string), Value: County obj
-    map<string, County> _counties;
+    unordered_map<string, County> _counties;
 
     public:
 
@@ -95,7 +95,7 @@ class CountyManager {
 
 
 
-    using const_iterator = map<string, County>::const_iterator;
+    using const_iterator = unordered_map<string, County>::const_iterator;
     const_iterator begin() const { return _counties.begin(); }
     const_iterator end() const { return _counties.end(); }
 
