@@ -245,6 +245,17 @@ bool CountyManager::getFormatedData(int start_year, int start_month, int start_d
 
 }
 
+string CountyManager::getFullCountyName(const string& fips) const
+{
+    auto it = _counties.find(fips);
+
+    if (it != _counties.end()) {
+        return it->second._name + ", " + it->second._state;
+    }
+    return "";
+
+}
+
 
 
 

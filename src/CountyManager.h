@@ -118,6 +118,14 @@ class CountyManager {
     bool getFormatedData(int start_year,int start_month, int start_day, int end_year, int end_month, int end_day,vector<std::pair<float,string>> &outputvector);
 
 
+    /**
+     * returns the full name of the county ("County Name, State")
+     * given its 5-digit fips code.
+     * @param fips The 5-digit fips string.
+     * @return a string containing "Name, State" or "" if not found.
+     */
+    string getFullCountyName(const std::string& fips) const;
+
 
 };
 
