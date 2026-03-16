@@ -22,6 +22,35 @@ TEST_CASE("CountyManager: Output methods", "[Output methods]") {
 		REQUIRE_FALSE(county._name.empty());
 		REQUIRE_THROWS_AS(manager["99999"], std::out_of_range);
 	}
+	SECTION("getFullCountyName") {
+
+		string fullName = manager.getFullCountyName("01021");
+
+
+		REQUIRE_FALSE(fullName.empty());
+		REQUIRE(fullName.find(", ") != string::npos);
+		REQUIRE(fullName == "Chilton County, AL");
+
+
+		REQUIRE(manager.getFullCountyName("99999") == "");
+	}
+	SECTION("getFipsByName")
+	{
+		REQUIRE(manager.getFipsByName("Chilton County", "AL")=="01021");
+
+
+		if (manager.hasCounty("01021")) {
+			string name = manager["01021"]._name;
+			string state = manager["01021"]._state;
+			REQUIRE(manager.getFipsByName(name, state) == "01021");
+		}
+
+
+		REQUIRE(manager.getFipsByName("NonExistent", "ZZ") == "");
+
+
+		REQUIRE(manager.getFipsByName("Chilton", "AL") == "");
+	}
 
 }
 
@@ -152,3 +181,5 @@ TEST_CASE("Full data Export tests", "[Data Export]") {
 		}
 	}
 }
+
+
