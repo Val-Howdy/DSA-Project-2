@@ -256,6 +256,18 @@ string CountyManager::getFullCountyName(const string& fips) const
 
 }
 
+string CountyManager::getFipsByName(const string& name, const string& state) const
+{
+    for (auto it = _counties.begin(); it != _counties.end(); ++it)
+    {
+        if (it->second._name == name && it->second._state == state)
+        {
+            return it->first;
+        }
+    }
+    return "";
+}
+
 
 
 

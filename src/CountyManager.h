@@ -127,6 +127,15 @@ class CountyManager {
     string getFullCountyName(const std::string& fips) const;
 
 
+    /**
+     * searches for a county by name and state and returns its fips code.
+     * @param name The name of the county ("Barbour County").
+     * @param state The name of the state ("AL").
+     * @return The 5-digit fips string, or an empty string if no match is found.
+     */
+    string getFipsByName(const std::string& name, const std::string& state) const;
+
+
 };
 
 
