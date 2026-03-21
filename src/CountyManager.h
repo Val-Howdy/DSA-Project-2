@@ -112,7 +112,7 @@ class CountyManager {
      * the county population, and stores the result as a pair (cases_per_capita, FIPS).
      * @param start_year, start_month, start_day Beginning of the range.
      * @param end_year, end_month, end_day End of the range.
-     * @param outputvector Vector to be populated with pairs of {float: per_capita, string: fips}.
+     * @param outputvector Vector to be populated with pairs of {float: per_capita, County*}.
      * @return true if the date range is valid and data was processed, false otherwise.
      */
     bool getFormatedData(int start_year,int start_month, int start_day, int end_year, int end_month, int end_day,vector<std::pair<float,CountyManager::County*>> &outputvector);
@@ -135,6 +135,16 @@ class CountyManager {
      */
     string getFipsByName(const std::string& name, const std::string& state) const;
 
+    /**
+    * calculates total cases for a county between two dates.
+    * Returns -1 if dates are out of bounds.
+    */
+    static int getTotalCasesByDate(const County& county, int start_y, int start_m, int start_d, int end_y, int end_m, int end_d);
+
+    /**
+    * sums cases in the [start_index, end_index] range (inclusive).
+    */
+    static int getTotalCasesByIndex(const County& county, int start_index, int end_index);
 
 };
 

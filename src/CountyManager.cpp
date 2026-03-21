@@ -222,26 +222,21 @@ int CountyManager::getClosestWeekAfter(int year, int month, int day)
 bool CountyManager::getFormatedData(int start_year, int start_month, int start_day,
     int end_year, int end_month, int end_day, vector<std::pair<float, County*>>& outputvector)
 {
-    int start_index = getClosestWeekBefore(start_year, start_month, start_day);
-    if (start_index == -1) return false;
-    int end_index = getClosestWeekAfter(end_year, end_month, end_day);
-    if (end_index == -1) return false;
-    if (end_index < start_index) return false;
-
     for (auto & pair : _counties)
     {
-        int total_loops = end_index - start_index + 1;
-        int total_cases =0;
-        for (int i = 0; i < total_loops; i++)
-        {
-            total_cases += pair.second._weeks[start_index + i]._cases;
+        County& county = pair.second;
+        int total_cases = getTotalCasesByDate(county, start_year, start_month, start_day, end_year, end_month, end_day);
+        if (total_cases == -1) {
+            return false;
         }
-        float cases_per_capita = float(total_cases) / pair.second._population;
+        float cases_per_capita = 0.0f;
+        if (county._population > 0) {
+            cases_per_capita = static_cast<float>(total_cases) / county._population;
+        }
+
         outputvector.emplace_back(cases_per_capita, &pair.second);
     }
-
     return true;
-
 
 }
 
@@ -266,6 +261,31 @@ string CountyManager::getFipsByName(const string& name, const string& state) con
         }
     }
     return "";
+}
+
+int CountyManager::getTotalCasesByDate(const County& county, int start_y, int start_m, int start_d, int end_y,
+    int end_m, int end_d)
+{
+    int start = getClosestWeekBefore(start_y, start_m, start_d);
+    int end = getClosestWeekAfter(end_y, end_m, end_d);
+
+    if (start == -1 || end == -1 || end < start) {
+        return -1;
+    }
+
+    return getTotalCasesByIndex(county, start, end);
+}
+
+
+int CountyManager::getTotalCasesByIndex(const County& county, int start_index, int end_index)
+{
+    int total = 0;
+
+    for (int i = start_index; i <= end_index; ++i) {
+        total += county._weeks[i]._cases;
+    }
+
+    return total;
 }
 
 
