@@ -163,7 +163,7 @@ void CountyManager::loadPopulation(string &filename)
 }
 
 
-CountyManager::County CountyManager::operator[](string fips) const
+CountyManager::County& CountyManager::operator[](string fips)
 {
     return _counties.at(fips);
 }
@@ -220,7 +220,7 @@ int CountyManager::getClosestWeekAfter(int year, int month, int day)
 }
 
 bool CountyManager::getFormatedData(int start_year, int start_month, int start_day,
-    int end_year, int end_month, int end_day, vector<std::pair<float, string>>& outputvector)
+    int end_year, int end_month, int end_day, vector<std::pair<float, County*>>& outputvector)
 {
     int start_index = getClosestWeekBefore(start_year, start_month, start_day);
     if (start_index == -1) return false;
@@ -237,7 +237,7 @@ bool CountyManager::getFormatedData(int start_year, int start_month, int start_d
             total_cases += pair.second._weeks[start_index + i]._cases;
         }
         float cases_per_capita = float(total_cases) / pair.second._population;
-        outputvector.emplace_back(cases_per_capita, pair.first);
+        outputvector.emplace_back(cases_per_capita, &pair.second);
     }
 
     return true;

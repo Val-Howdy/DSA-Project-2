@@ -82,7 +82,7 @@ class CountyManager {
     * @return A copy of the county object.
     * @throws std::out_of_range if the fips code is not found.
     */
-    County operator[](string fips) const;
+    County& operator[](string fips);
 
 
     /**
@@ -115,7 +115,7 @@ class CountyManager {
      * @param outputvector Vector to be populated with pairs of {float: per_capita, string: fips}.
      * @return true if the date range is valid and data was processed, false otherwise.
      */
-    bool getFormatedData(int start_year,int start_month, int start_day, int end_year, int end_month, int end_day,vector<std::pair<float,string>> &outputvector);
+    bool getFormatedData(int start_year,int start_month, int start_day, int end_year, int end_month, int end_day,vector<std::pair<float,CountyManager::County*>> &outputvector);
 
 
     /**
