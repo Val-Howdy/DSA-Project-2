@@ -25,6 +25,16 @@ struct DummyMethodResultStruct {
 	std::vector<DummyDataResultStruct> results;
 };
 
+void topKQuickselect(std::vector<std::pair<float, std::string>>& data, int k)
+{
+
+}
+
+void topKHeapInPlace(vector<std::pair<float, string>>& data, int k)
+{
+
+}
+
 bool isValidDate(int year, int month, int day) {
 	auto ymd = std::chrono::year_month_day(std::chrono::year(year), std::chrono::month(month), std::chrono::day(day));
 
