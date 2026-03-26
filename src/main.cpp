@@ -159,7 +159,8 @@ void printHeader(float runtime, const std::string& method, const std::string& st
 	printSeparator(showWeeks);
 	std::cout << "| k: " << std::left << std::setw(totalWidth-3) << k << "|" << std::endl;
 	printSeparator(showWeeks);
-	std::cout << "| Runtime: " << std::fixed << std::setprecision(4) << std::setw(totalWidth-9) << std::left << runtime << "|" << std::endl;
+	std::string runtimeStr = std::to_string(runtime) + " ms";
+	std::cout << "| Runtime: " << std::setw(totalWidth-9) << std::left << runtimeStr << "|" << std::endl;
 	printSeparator(showWeeks);
 	std::cout << "| " << std::left << std::setw(5)  << "Rank"
 	          << "| " << std::setw(6)  << "State"
