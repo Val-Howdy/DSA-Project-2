@@ -131,6 +131,15 @@ TEST_CASE("CountyManager: Helper methods", "[Helper Methods]") {
 		// Past the end of the data
 		REQUIRE(CountyManager::getClosestWeekAfter(2023, 5, 11)== -1);
 	}
+
+	SECTION("getDateFromIndex")
+	{
+		REQUIRE(CountyManager::getDateFromIndex(0) == "2020-01-22");
+		REQUIRE(CountyManager::getDateFromIndex(1) == "2020-01-29");
+		//leap year
+		REQUIRE(CountyManager::getDateFromIndex(10) == "2020-04-01");
+		REQUIRE(CountyManager::getDateFromIndex(52) == "2021-01-20");
+	}
 }
 
 
@@ -140,19 +149,19 @@ TEST_CASE("CountyManager: getFormatedData error handling", "[Data Export]") {
 
 	SECTION("Invalid Range: End before Start") {
 		// Start: 2021-01-01, End: 2020-01-01
-		bool success = manager.getFormatedData(2021, 1, 1, 2020, 1, 1, output);
+		bool success = manager.getFormatedDataCounty(2021, 1, 1, 2020, 1, 1, output);
 		REQUIRE_FALSE(success);
 	}
 
 	SECTION("Out of Bounds: Date before dataset start") {
 		// Dataset starts 2020-01-22
-		bool success = manager.getFormatedData(2019, 12, 31, 2020, 1, 1, output);
+		bool success = manager.getFormatedDataCounty(2019, 12, 31, 2020, 1, 1, output);
 		REQUIRE_FALSE(success);
 	}
 
 	SECTION("Out of Bounds: Date after dataset end") {
 		// Dataset ends 2023-05-10
-		bool success = manager.getFormatedData(2023, 6, 1, 2023, 7, 1, output);
+		bool success = manager.getFormatedDataCounty(2023, 6, 1, 2023, 7, 1, output);
 		REQUIRE_FALSE(success);
 	}
 }
@@ -162,7 +171,7 @@ TEST_CASE("Full data Export tests", "[Data Export]") {
 	vector<pair<float, CountyManager::County*>> output;
 
 	// First two weeks of the dataset (Jan 22, 2020 to Feb 5, 2020)
-	bool success = manager.getFormatedData(2020, 1, 22, 2020, 2, 5, output);
+	bool success = manager.getFormatedDataCounty(2020, 1, 22, 2020, 2, 5, output);
 
 	REQUIRE(success);
 	REQUIRE_FALSE(output.empty());
@@ -179,6 +188,38 @@ TEST_CASE("Full data Export tests", "[Data Export]") {
 
 			REQUIRE(it->first == Catch::Approx(expected_per_capita));
 		}
+	}
+
+	SECTION("getFormatedDataWeek") {
+		vector<tuple<float, CountyManager::County*, int>> weekOutput;
+		bool success = manager.getFormatedDataWeek(2020, 1, 22, 2020, 2, 5, weekOutput);
+
+		REQUIRE(success);
+		REQUIRE_FALSE(weekOutput.empty());
+
+		string targetFips = "01021";
+		auto& targetCounty = manager[targetFips];
+
+
+		vector<tuple<float, CountyManager::County*, int>> targetCountyResults;
+		for (const auto& item : weekOutput) {
+			if (std::get<1>(item) == &targetCounty) {
+				targetCountyResults.push_back(item);
+			}
+		}
+
+
+		REQUIRE(targetCountyResults.size() == 3);
+
+
+		auto [perCapita, countyPtr, weekindex] = targetCountyResults[1];
+
+		int actualCases = targetCounty._weeks[1]._cases;
+		float expectedPerCapita = static_cast<float>(actualCases) / targetCounty._population;
+
+		REQUIRE(countyPtr == &targetCounty);
+		REQUIRE(weekindex == 1);
+		REQUIRE(perCapita == Catch::Approx(expectedPerCapita));
 	}
 }
 

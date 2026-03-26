@@ -13,6 +13,8 @@
 #include <iostream>
 #include <algorithm>
 #include <iomanip>
+#include <chrono>
+
 
 using std::string;
 using std::vector;
@@ -44,6 +46,9 @@ class CountyManager {
     private:
     // county map. Key: fips code (5 digit string), Value: County obj
     unordered_map<string, County> _counties;
+
+    string _lastFips;
+    County* _lastCounty = nullptr;
 
     public:
 
@@ -115,8 +120,11 @@ class CountyManager {
      * @param outputvector Vector to be populated with pairs of {float: per_capita, County*}.
      * @return true if the date range is valid and data was processed, false otherwise.
      */
-    bool getFormatedData(int start_year,int start_month, int start_day, int end_year, int end_month, int end_day,vector<std::pair<float,CountyManager::County*>> &outputvector);
+    bool getFormatedDataCounty(int start_year,int start_month, int start_day, int end_year, int end_month, int end_day,vector<std::pair<float,CountyManager::County*>> &outputvector);
 
+
+    bool getFormatedDataWeek(int start_year, int start_month, int start_day,
+    int end_year, int end_month, int end_day, vector<std::tuple<float, County*,int>>& outputvector);
 
     /**
      * returns the full name of the county ("County Name, State")
@@ -146,6 +154,7 @@ class CountyManager {
     */
     static int getTotalCasesByIndex(const County& county, int start_index, int end_index);
 
+    static string getDateFromIndex(int index);
 };
 
 
