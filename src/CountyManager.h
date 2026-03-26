@@ -120,7 +120,7 @@ class CountyManager {
      * @param outputvector Vector to be populated with pairs of {float: per_capita, County*}.
      * @return true if the date range is valid and data was processed, false otherwise.
      */
-    bool getFormatedDataCounty(int start_year,int start_month, int start_day, int end_year, int end_month, int end_day,vector<std::pair<float,CountyManager::County*>> &outputvector);
+    bool getFormatedDataCounty(int start_year,int start_month, int start_day, int end_year, int end_month, int end_day,vector<std::tuple<float,CountyManager::County*,int>> &outputvector);
 
 
     bool getFormatedDataWeek(int start_year, int start_month, int start_day,

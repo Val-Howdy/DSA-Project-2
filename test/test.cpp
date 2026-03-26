@@ -145,7 +145,7 @@ TEST_CASE("CountyManager: Helper methods", "[Helper Methods]") {
 
 TEST_CASE("CountyManager: getFormatedData error handling", "[Data Export]") {
 	CountyManager manager("data/test_Covid_data.csv", "data/test_Population_data.csv");
-	vector<pair<float, CountyManager::County*>> output;
+	vector<tuple<float, CountyManager::County*,int>> output;
 
 	SECTION("Invalid Range: End before Start") {
 		// Start: 2021-01-01, End: 2020-01-01
@@ -168,7 +168,7 @@ TEST_CASE("CountyManager: getFormatedData error handling", "[Data Export]") {
 
 TEST_CASE("Full data Export tests", "[Data Export]") {
 	CountyManager manager("data/Covid_data.csv", "data/Population_data.csv");
-	vector<pair<float, CountyManager::County*>> output;
+	vector<tuple<float, CountyManager::County*,int>> output;
 
 	// First two weeks of the dataset (Jan 22, 2020 to Feb 5, 2020)
 	bool success = manager.getFormatedDataCounty(2020, 1, 22, 2020, 2, 5, output);
@@ -179,14 +179,14 @@ TEST_CASE("Full data Export tests", "[Data Export]") {
 	SECTION("verify specific County") {
 		string targetFips = "01021";
 		auto it = find_if(output.begin(), output.end(),
-			[&](pair<float, CountyManager::County*>& p) { return p.second == &manager[targetFips]; });
+			[&](tuple<float, CountyManager::County*,int>& p) { return get<1>(p)== &manager[targetFips]; });
 
 		if (it != output.end()) {
 			auto county = manager[targetFips];
 			int expected_cases = county._weeks[0]._cases + county._weeks[1]._cases + county._weeks[2]._cases;
 			float expected_per_capita = (float)expected_cases / county._population;
 
-			REQUIRE(it->first == Catch::Approx(expected_per_capita));
+			REQUIRE(get<0>(*it) == Catch::Approx(expected_per_capita));
 		}
 	}
 

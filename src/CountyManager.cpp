@@ -232,7 +232,7 @@ int CountyManager::getClosestWeekAfter(int year, int month, int day)
 }
 
 bool CountyManager::getFormatedDataCounty(int start_year, int start_month, int start_day,
-    int end_year, int end_month, int end_day, vector<std::pair<float, County*>>& outputvector)
+    int end_year, int end_month, int end_day, vector<std::tuple<float, County*, int>>& outputvector)
 {
     for (auto & pair : _counties)
     {
@@ -246,7 +246,7 @@ bool CountyManager::getFormatedDataCounty(int start_year, int start_month, int s
             cases_per_capita = static_cast<float>(total_cases) / county._population;
         }
 
-        outputvector.emplace_back(cases_per_capita, &pair.second);
+        outputvector.emplace_back(cases_per_capita, &county, -1);
     }
     return true;
 

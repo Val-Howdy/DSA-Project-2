@@ -16,6 +16,7 @@ struct MethodResultStruct {
 		std::string county;
 		int totalCases;
 		float casesPerCapita;
+		int week;
 
 		DataResultStruct() {
 			rank = -1;
@@ -23,6 +24,7 @@ struct MethodResultStruct {
 			county = "Dummy";
 			totalCases = -1;
 			casesPerCapita = -1.0f;
+			week = -1;
 		}
 	};
 
@@ -30,12 +32,12 @@ struct MethodResultStruct {
 	std::vector<DataResultStruct> results;
 };
 
-int partitionQuickselect(vector<pair<float, CountyManager::County*>>& data, int left, int right) {
-	float pivot = data[right].first;
+int partitionQuickselect(vector<tuple<float, CountyManager::County*,int>>& data, int left, int right) {
+	float pivot = get<0>(data[right]);
 	int i = left;
 
 	for (int j = left; j < right; j++) {
-		if (data[j].first > pivot) {
+		if (get<0>(data[j]) > pivot) {
 			swap(data[i], data[j]);
 			i++;
 		}
@@ -45,7 +47,7 @@ int partitionQuickselect(vector<pair<float, CountyManager::County*>>& data, int 
 	return i;
 }
 
-void quickselect(vector<pair<float, CountyManager::County*>>& data, int left, int right, int kIndex) {
+void quickselect(vector<tuple<float, CountyManager::County*,int>>& data, int left, int right, int kIndex) {
 	while (left < right) {
 		int pivotIndex = partitionQuickselect(data, left, right);
 
@@ -61,7 +63,7 @@ void quickselect(vector<pair<float, CountyManager::County*>>& data, int left, in
 	}
 }
 
-void topKQuickselect(std::vector<std::pair<float, CountyManager::County*>>& data, int k)
+void topKQuickselect(std::vector<tuple<float, CountyManager::County*,int>>& data, int k)
 {
 	if (data.empty() || k <= 0) {
 		return;
@@ -74,23 +76,23 @@ void topKQuickselect(std::vector<std::pair<float, CountyManager::County*>>& data
 	quickselect(data, 0, static_cast<int>(data.size()) - 1, k - 1);
 
 	sort(data.begin(), data.begin() + k,
-		[](const pair<float, CountyManager::County*>& a,
-		   const pair<float, CountyManager::County*>& b) {
-			return a.first > b.first;
+		[](const tuple<float, CountyManager::County*,int>& a,
+		   const tuple<float, CountyManager::County*,int>& b) {
+			return get<0>(a) > get<0>(b);
 		});
 }
 
-void heapifyDown(vector<pair<float, CountyManager::County*>>& data, int heapSize, int index) {
+void heapifyDown(vector<tuple<float, CountyManager::County*,int>>& data, int heapSize, int index) {
 	while (true) {
 		int largest = index;
 		int left = 2 * index + 1;
 		int right = 2 * index + 2;
 
-		if (left < heapSize && data[left].first > data[largest].first) {
+		if (left < heapSize && get<0>(data[left]) > get<0>(data[largest])) {
 			largest = left;
 		}
 
-		if (right < heapSize && data[right].first > data[largest].first) {
+		if (right < heapSize && get<0>(data[right]) > get<0>(data[largest])) {
 			largest = right;
 		}
 
@@ -103,13 +105,13 @@ void heapifyDown(vector<pair<float, CountyManager::County*>>& data, int heapSize
 	}
 }
 
-void buildMaxHeap(vector<pair<float, CountyManager::County*>>& data) {
+void buildMaxHeap(vector<tuple<float, CountyManager::County*,int>>& data) {
 	for (int i = static_cast<int>(data.size()) / 2 - 1; i >= 0; i--) {
 		heapifyDown(data, static_cast<int>(data.size()), i);
 	}
 }
 
-void topKHeapInPlace(vector<std::pair<float, CountyManager::County*>>& data, int k)
+void topKHeapInPlace(vector<tuple<float, CountyManager::County*,int>>& data, int k)
 {
 	if (data.empty() || k <= 0) {
 		return;
@@ -141,29 +143,34 @@ bool isValidDate(int year, int month, int day) {
 	return ymd.ok();
 }
 
-void printSeparator() {
-	std::cout << std::string(75, '-') << std::endl;
+void printSeparator(bool showWeeks) {
+	int totalWidth = 75 + (showWeeks ? 14 : 0);
+	std::cout << std::string(totalWidth, '-') << std::endl;
 }
 
-void printHeader(float runtime, const std::string& method, const std::string& startDate, const std::string& endDate, int k) {
-	printSeparator();
-	std::cout << "| Method: " << std::left << std::setw(64) << method << "|" << std::endl;
-	printSeparator();
-	std::cout << "| Start date: " << std::left << std::setw(60) << startDate << "|" << std::endl;
-	printSeparator();
-	std::cout << "| End date: " << std::left << std::setw(62) << endDate << "|" << std::endl;
-	printSeparator();
-	std::cout << "| k: " << std::left << std::setw(69) << k << "|" << std::endl;
-	printSeparator();
-	std::cout << "| Runtime: " << std::fixed << std::setprecision(4) << std::setw(63) << std::left << runtime << "|" << std::endl;
-	printSeparator();
+void printHeader(float runtime, const std::string& method, const std::string& startDate, const std::string& endDate, int k, bool showWeeks) {
+	int totalWidth = 72 + (showWeeks ? 14 : 0);
+	printSeparator(showWeeks);
+	std::cout << "| Method: " << std::left << std::setw(totalWidth-8) << method << "|" << std::endl;
+	printSeparator(showWeeks);
+	std::cout << "| Start date: " << std::left << std::setw(totalWidth-12) << startDate << "|" << std::endl;
+	printSeparator(showWeeks);
+	std::cout << "| End date: " << std::left << std::setw(totalWidth-10) << endDate << "|" << std::endl;
+	printSeparator(showWeeks);
+	std::cout << "| k: " << std::left << std::setw(totalWidth-3) << k << "|" << std::endl;
+	printSeparator(showWeeks);
+	std::cout << "| Runtime: " << std::fixed << std::setprecision(4) << std::setw(totalWidth-9) << std::left << runtime << "|" << std::endl;
+	printSeparator(showWeeks);
 	std::cout << "| " << std::left << std::setw(5)  << "Rank"
 	          << "| " << std::setw(6)  << "State"
-	          << "| " << std::setw(20) << "County"
-	          << "| " << std::setw(16) << "Total New Cases"
+	          << "| " << std::setw(20) << "County";
+	if (showWeeks) {
+		std::cout << "| " << std::setw(12) << "Week Of";
+	}
+	std::cout << "| " << std::setw(16) << "Total New Cases"
 	          << "| " << std::setw(17) << "Cases per Capita"
 	          << "|" << std::endl;
-	printSeparator();
+	printSeparator(showWeeks);
 }
 
 void printResults(const std::vector<MethodResultStruct::DataResultStruct>& results,
@@ -171,22 +178,27 @@ void printResults(const std::vector<MethodResultStruct::DataResultStruct>& resul
                   const std::string& method,
                   const std::string& startDate,
                   const std::string& endDate,
-                  int k) {
-	printHeader(runtime, method, startDate, endDate, k);
+                  int k,
+                  bool showWeeks) {
+
+	printHeader(runtime, method, startDate, endDate, k, showWeeks);
 
 	for (const auto& r : results) {
 		std::cout << "| " << std::left << std::setw(5)  << r.rank
 		          << "| " << std::setw(6)  << r.state
-		          << "| " << std::setw(20) << r.county
-		          << "| " << std::setw(16) << r.totalCases
+		          << "| " << std::setw(20) << r.county;
+		if (showWeeks) {
+			cout << "| " << setw(12) << CountyManager::getDateFromIndex(r.week);
+		}
+		std::cout << "| " << std::setw(16) << r.totalCases
 		          << "| " << std::setw(17) << std::fixed << std::setprecision(6) << r.casesPerCapita
 		          << "|" << std::endl;
 	}
 
-	printSeparator();
+	printSeparator(showWeeks);
 }
 
-MethodResultStruct buildResultVector(vector<pair<float, CountyManager::County*>>& data, int k, const string& method) {
+MethodResultStruct buildResultVector(vector<tuple<float, CountyManager::County*,int>>& data, int k, const string& method) {
 	MethodResultStruct output;
 
 	if (k > static_cast<int>(data.size())) {
@@ -209,11 +221,13 @@ MethodResultStruct buildResultVector(vector<pair<float, CountyManager::County*>>
 		for (int i = 0; i < k; i++) {
 			MethodResultStruct::DataResultStruct row;
 			row.rank = i + 1;
-			row.state = data[i].second->_state;
-			row.county = data[i].second->_name;
-			row.casesPerCapita = data[i].first;
-			row.totalCases = static_cast<int>(data[i].first * data[i].second->_population + 0.5f);
+			row.state = get<1>(data[i])->_state;
+			row.county = get<1>(data[i])->_name;
+			row.casesPerCapita = get<0>(data[i]);
+			row.week= get<2>(data[i]);
+			row.totalCases = static_cast<int>(get<0>(data[i]) * get<1>(data[i])->_population + 0.5f);
 			output.results.push_back(row);
+
 		}
 	}
 	else {
@@ -221,10 +235,11 @@ MethodResultStruct buildResultVector(vector<pair<float, CountyManager::County*>>
 		for (int i = 0; i < k; i++) {
 			MethodResultStruct::DataResultStruct row;
 			row.rank = i + 1;
-			row.state = data[n - k + i].second->_state;
-			row.county = data[n - k + i].second->_name;
-			row.casesPerCapita = data[n - k + i].first;
-			row.totalCases = static_cast<int>(data[n - k + i].first * data[n - k + i].second->_population + 0.5f);
+			row.state = get<1>(data[n - k + i])->_state;
+			row.county = get<1>(data[n - k + i])->_name;
+			row.casesPerCapita = get<0>(data[n - k + i]);
+			row.week= get<2>(data[i]);
+			row.totalCases = static_cast<int>(get<0>(data[n - k + i]) * get<1>(data[n - k + i])->_population + 0.5f);
 			output.results.push_back(row);
 		}
 	}
@@ -233,11 +248,12 @@ MethodResultStruct buildResultVector(vector<pair<float, CountyManager::County*>>
 }
 
 int main(int argc, char* argv[]) {
-	if (argc != 5) {
-		std::cerr << "Usage: " << argv[0] << " <method> <start_date> <end_date> <k>" << std::endl;
+	if (argc != 6) {
+		std::cerr << "Usage: " << argv[0] << " <method> <start_date> <end_date> <k> [Counties|Weeks]" << std::endl;
 		std::cerr << "Methods: Quickselect or Heap" << std::endl;
 		std::cerr << "Date format: YYYY-MM-DD" << std::endl;
 		std::cerr << "Valid k is int greater than 0" << std::endl;
+		std::cerr << "Mode: Weeks or Counties " << std::endl;
 		return 1;
 	}
 
@@ -295,14 +311,27 @@ int main(int argc, char* argv[]) {
 		return 1;
 	}
 
-	CountyManager manager("data/Covid_data.csv", "data/Population_data.csv");
-	vector<pair<float, CountyManager::County*>> data;
+	bool showWeeks = false;
+	if (argc == 6) {
+		string mode = argv[5];
+		if (mode == "Weeks") {
+			showWeeks = true;
+		}
+	}
 
-	bool success = manager.getFormatedData(
-		startDateYear, startDateMonth, startDateDay,
-		endDateYear, endDateMonth, endDateDay,
-		data
-	);
+	CountyManager manager("data/Covid_data.csv", "data/Population_data.csv");
+	vector<tuple<float, CountyManager::County*,int>> data;
+
+	bool success = false;
+	if (showWeeks) {
+		success = manager.getFormatedDataWeek(
+			startDateYear, startDateMonth, startDateDay,
+			endDateYear, endDateMonth, endDateDay, data);
+	} else {
+		success = manager.getFormatedDataCounty(
+			startDateYear, startDateMonth, startDateDay,
+			endDateYear, endDateMonth, endDateDay, data);
+	}
 
 	if (!success) {
 		std::cerr << "Error: Invalid date range or date outside dataset bounds" << std::endl;
@@ -315,7 +344,7 @@ int main(int argc, char* argv[]) {
 	}
 
 	MethodResultStruct results = buildResultVector(data, k, method);
-	printResults(results.results, results.runtime, method, startDate, endDate, k);
+	printResults(results.results, results.runtime, method, startDate, endDate, k,showWeeks);
 
 	return 0;
 }
