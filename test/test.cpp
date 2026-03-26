@@ -131,6 +131,15 @@ TEST_CASE("CountyManager: Helper methods", "[Helper Methods]") {
 		// Past the end of the data
 		REQUIRE(CountyManager::getClosestWeekAfter(2023, 5, 11)== -1);
 	}
+
+	SECTION("getDateFromIndex")
+	{
+		REQUIRE(CountyManager::getDateFromIndex(0) == "2020-01-22");
+		REQUIRE(CountyManager::getDateFromIndex(1) == "2020-01-29");
+		//leap year
+		REQUIRE(CountyManager::getDateFromIndex(10) == "2020-04-01");
+		REQUIRE(CountyManager::getDateFromIndex(52) == "2021-01-20");
+	}
 }
 
 
