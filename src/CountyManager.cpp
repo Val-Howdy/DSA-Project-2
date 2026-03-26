@@ -71,10 +71,22 @@ void CountyManager::County::addData(std::stringstream& ss)
 void CountyManager::load(std::stringstream &ss)
 {
     std::string fips = cleanGetline(ss);
-    std::string name = cleanGetline(ss);
-    std::string state = cleanGetline(ss);
-    auto [it, inserted] = _counties.try_emplace(fips, name, state);
-    it->second.addData(ss);
+
+    County* currentCounty = nullptr;
+    if (fips == _lastFips && _lastCounty != nullptr) {
+        cleanGetline(ss);
+        cleanGetline(ss);
+        currentCounty = _lastCounty;
+    } else
+    {
+        std::string name = cleanGetline(ss);
+        std::string state = cleanGetline(ss);
+        auto [it, inserted] = _counties.try_emplace(fips, name, state);
+        currentCounty = &it->second;
+        _lastFips = fips;
+        _lastCounty = currentCounty;
+    }
+    currentCounty->addData(ss);
 }
 
 /**

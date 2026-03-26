@@ -47,6 +47,9 @@ class CountyManager {
     // county map. Key: fips code (5 digit string), Value: County obj
     unordered_map<string, County> _counties;
 
+    string _lastFips;
+    County* _lastCounty = nullptr;
+
     public:
 
     /**
