@@ -219,7 +219,7 @@ int CountyManager::getClosestWeekAfter(int year, int month, int day)
     return index;
 }
 
-bool CountyManager::getFormatedData(int start_year, int start_month, int start_day,
+bool CountyManager::getFormatedDataCounty(int start_year, int start_month, int start_day,
     int end_year, int end_month, int end_day, vector<std::pair<float, County*>>& outputvector)
 {
     for (auto & pair : _counties)
@@ -235,6 +235,28 @@ bool CountyManager::getFormatedData(int start_year, int start_month, int start_d
         }
 
         outputvector.emplace_back(cases_per_capita, &pair.second);
+    }
+    return true;
+
+}
+
+bool CountyManager::getFormatedDataWeek(int start_year, int start_month, int start_day,
+    int end_year, int end_month, int end_day, vector<std::tuple<float, County*,int>>& outputvector)
+{
+    int start_index = getClosestWeekBefore(start_year, start_month, start_day);
+    if (start_index == -1) return false;
+    int end_index = getClosestWeekAfter(end_year, end_month, end_day);
+    if (end_index == -1) return false;
+    if (end_index < start_index) return false;
+
+    for (auto & pair : _counties)
+    {
+        County& county = pair.second;
+        for (int i = start_index; i <= end_index; ++i)
+        {
+            float cases_per_capita = static_cast<float>(county._weeks[i]._cases) / county._population;
+            outputvector.emplace_back(cases_per_capita, &county, i);
+        }
     }
     return true;
 
@@ -286,6 +308,19 @@ int CountyManager::getTotalCasesByIndex(const County& county, int start_index, i
     }
 
     return total;
+}
+
+string CountyManager::getDateFromIndex(int index)
+{
+    using namespace std::chrono;
+
+    year_month_day startDate{year{2020}, month{1}, day{22}};
+
+    sys_days calculatedDate = sys_days{startDate} + days{index * 7};
+
+    year_month_day targetDate{calculatedDate};
+
+    return std::format("{:%F}", targetDate);
 }
 
 
