@@ -144,12 +144,12 @@ bool isValidDate(int year, int month, int day) {
 }
 
 void printSeparator(bool showWeeks) {
-	int totalWidth = 75 + (showWeeks ? 14 : 0);
+	int totalWidth = 89 + (showWeeks ? 14 : 0);
 	std::cout << std::string(totalWidth, '-') << std::endl;
 }
 
 void printHeader(float runtime, const std::string& method, const std::string& startDate, const std::string& endDate, int k, bool showWeeks) {
-	int totalWidth = 72 + (showWeeks ? 14 : 0);
+	int totalWidth = 86 + (showWeeks ? 14 : 0);
 	printSeparator(showWeeks);
 	std::cout << "| Method: " << std::left << std::setw(totalWidth-8) << method << "|" << std::endl;
 	printSeparator(showWeeks);
@@ -163,7 +163,7 @@ void printHeader(float runtime, const std::string& method, const std::string& st
 	printSeparator(showWeeks);
 	std::cout << "| " << std::left << std::setw(5)  << "Rank"
 	          << "| " << std::setw(6)  << "State"
-	          << "| " << std::setw(20) << "County";
+	          << "| " << std::setw(34) << "County";
 	if (showWeeks) {
 		std::cout << "| " << std::setw(12) << "Week Of";
 	}
@@ -186,7 +186,7 @@ void printResults(const std::vector<MethodResultStruct::DataResultStruct>& resul
 	for (const auto& r : results) {
 		std::cout << "| " << std::left << std::setw(5)  << r.rank
 		          << "| " << std::setw(6)  << r.state
-		          << "| " << std::setw(20) << r.county;
+		          << "| " << std::setw(34) << r.county;
 		if (showWeeks) {
 			cout << "| " << setw(12) << CountyManager::getDateFromIndex(r.week);
 		}
