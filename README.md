@@ -22,3 +22,26 @@ of data points, the project implements and compares two selection algorithms:
 | end_date  | YYYY-MM-DD  |  End of the analysis period |
 |  k | Integer > 0  |  Number of top results to return |
 |  mode | Counties or Week  |  Analysis Mode |
+
+## Getting Started
+### Prerequisites
+* C++20 compiler: GCC, Clang, MSVC, MinGW
+* OS: Linux, macOS, or Windows
+
+## Example Build and Run
+
+### Linux/macOS
+```bash
+git clone https://github.com/Val-Howdy/DSA-Project-2.git
+cd DSA-Project-2
+g++ -std=c++20 src/main.cpp src/CountyManager.cpp -o main
+./main Quickselect 2021-01-01 2022-01-01 10 Weeks
+```
+
+### Windows
+```bash
+git clone https://github.com/Val-Howdy/DSA-Project-2.git
+cd DSA-Project-2
+g++ -std=c++20 src/main.cpp src/CountyManager.cpp -o main.exe
+main.exe Quickselect 2021-01-01 2022-01-01 10 Weeks
+```
