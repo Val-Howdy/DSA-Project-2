@@ -250,7 +250,7 @@ MethodResultStruct buildResultVector(vector<tuple<float, CountyManager::County*,
 
 int main(int argc, char* argv[]) {
 	if (argc != 6) {
-		std::cerr << "Usage: " << argv[0] << " <method> <start_date> <end_date> <k> [Counties|Weeks]" << std::endl;
+		std::cerr << "Usage: " << argv[0] << " <method> <start_date> <end_date> <k> <mode>" << std::endl;
 		std::cerr << "Methods: Quickselect or Heap" << std::endl;
 		std::cerr << "Date format: YYYY-MM-DD" << std::endl;
 		std::cerr << "Valid k is int greater than 0" << std::endl;
