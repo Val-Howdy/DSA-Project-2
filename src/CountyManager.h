@@ -108,21 +108,37 @@ class CountyManager {
 
     static int daysSinceEpoch(int y, int m, int d);
 
+    /**
+     * converts a calendar date into a week index (starting 01/22/2020).
+     * returns the floor.
+     * @return index 0-172 or -1 if out of range.
+     */
     static int getClosestWeekBefore(int year, int month, int day);
+
+    /**
+     * converts a calendar date into a week index (starting 01/22/2020).
+     * returns the ceiling.
+     * @return index 0-172 or -1 if out of range.
+     */
     static int getClosestWeekAfter(int year, int month, int day);
 
 
     /**
-     * calculates the total cases between start and end dates, divides by
-     * the county population, and stores the result as a pair (cases_per_capita, FIPS).
-     * @param start_year, start_month, start_day Beginning of the range.
-     * @param end_year, end_month, end_day End of the range.
-     * @param outputvector Vector to be populated with pairs of {float: per_capita, County*}.
+     * populates a vector with cumulative data for every county across a date range.
+     * @param start_year, start_month, start_day beginning of the range.
+     * @param end_year, end_month, end_day end of the range.
+     * @param outputvector stores tuples of {cases_per_capita, County*, dummy_index}
      * @return true if the date range is valid and data was processed, false otherwise.
      */
     bool getFormatedDataCounty(int start_year,int start_month, int start_day, int end_year, int end_month, int end_day,vector<std::tuple<float,CountyManager::County*,int>> &outputvector);
 
-
+    /**
+    * populates a vector with individual weekly data points for every county in a range.
+    * @param start_year, start_month, start_day beginning of the range.
+    * @param end_year, end_month, end_day end of the range.
+    * @param outputvector stores tuples of {cases_per_capita, County*, week_index}
+    * @return true if the date range is valid and data was processed, false otherwise.
+    */
     bool getFormatedDataWeek(int start_year, int start_month, int start_day,
     int end_year, int end_month, int end_day, vector<std::tuple<float, County*,int>>& outputvector);
 
@@ -154,6 +170,12 @@ class CountyManager {
     */
     static int getTotalCasesByIndex(const County& county, int start_index, int end_index);
 
+
+    /**
+     * Converts a week index back into a YYYY-MM-DD string.
+     * @param index weeks since 01/22/2020.
+     * @return "YYYY-MM-DD"
+     */
     static string getDateFromIndex(int index);
 };
 
